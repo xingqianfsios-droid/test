@@ -26,7 +26,7 @@ String getPieceName(PieceType type, PieceSide side) {
   return side == PieceSide.red ? redNames[type]! : blackNames[type]!;
 }
 
-/// 棋子组件
+/// 棋子组件 — 传统木质棋子风格
 class PieceWidget extends StatelessWidget {
   final PieceModel piece;
   final double size;
@@ -42,7 +42,7 @@ class PieceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isRed = piece.side == PieceSide.red;
-    final pieceColor = isRed ? Colors.red.shade800 : Colors.black87;
+    final textColor = isRed ? const Color(0xFFA01010) : const Color(0xFF1A1A1A);
     final name = getPieceName(piece.type, piece.side);
 
     return Container(
@@ -50,27 +50,53 @@ class PieceWidget extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: const Color(0xFFFAEBD7), // 棋子底色
+        // 木质棋子渐变底色
+        gradient: RadialGradient(
+          center: const Alignment(-0.2, -0.3),
+          radius: 0.9,
+          colors: isSelected
+              ? [const Color(0xFFFFF3D6), const Color(0xFFE8C878)]
+              : [const Color(0xFFF7E8C8), const Color(0xFFD4B47A)],
+        ),
         border: Border.all(
-          color: isSelected ? Colors.amber : pieceColor,
-          width: isSelected ? 3.0 : 2.0,
+          color: isSelected ? const Color(0xFFD4A84B) : const Color(0xFF6B3A1F),
+          width: isSelected ? 2.5 : 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 3,
+            color: Colors.black.withValues(alpha: isSelected ? 0.5 : 0.35),
+            blurRadius: isSelected ? 6 : 3,
             offset: const Offset(1, 2),
           ),
+          if (isSelected)
+            const BoxShadow(
+              color: Color(0x40D4A84B),
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
         ],
       ),
       child: Center(
-        child: Text(
-          name,
-          style: TextStyle(
-            fontSize: size * 0.5,
-            fontWeight: FontWeight.bold,
-            color: pieceColor,
-            height: 1.0,
+        child: Container(
+          width: size * 0.78,
+          height: size * 0.78,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: textColor.withValues(alpha: 0.3),
+              width: 1.0,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              name,
+              style: TextStyle(
+                fontSize: size * 0.48,
+                fontWeight: FontWeight.w900,
+                color: textColor,
+                height: 1.0,
+              ),
+            ),
           ),
         ),
       ),

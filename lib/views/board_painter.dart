@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 象棋棋盘绘制器
+/// 象棋棋盘绘制器 — 古风木纹风格
 class BoardPainter extends CustomPainter {
   /// 格子大小（由外部传入）
   final double cellSize;
@@ -18,20 +18,47 @@ class BoardPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     _drawBackground(canvas, size);
+    _drawBorder(canvas, size);
     _drawGrid(canvas);
     _drawPalaceDiagonals(canvas);
+    _drawStarPoints(canvas);
     _drawRiverText(canvas);
   }
 
   void _drawBackground(Canvas canvas, Size size) {
+    // 木质底色
     final paint = Paint()..color = const Color(0xFFDEB887);
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
+
+    // 细微木纹纹理效果
+    final grainPaint = Paint()
+      ..color = const Color(0x0A6B3A1F)
+      ..strokeWidth = 0.8
+      ..style = PaintingStyle.stroke;
+    for (double y = 0; y < size.height; y += 3.5) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), grainPaint);
+    }
+  }
+
+  void _drawBorder(Canvas canvas, Size size) {
+    // 外边框 — 深色粗框，模拟传统棋盘边框
+    final borderPaint = Paint()
+      ..color = const Color(0xFF3C2415)
+      ..strokeWidth = 3.0
+      ..style = PaintingStyle.stroke;
+    final borderRect = Rect.fromLTWH(
+      offsetX - cellSize * 0.15,
+      offsetY - cellSize * 0.15,
+      8 * cellSize + cellSize * 0.3,
+      9 * cellSize + cellSize * 0.3,
+    );
+    canvas.drawRect(borderRect, borderPaint);
   }
 
   void _drawGrid(Canvas canvas) {
     final paint = Paint()
-      ..color = Colors.black
-      ..strokeWidth = 1.5
+      ..color = const Color(0xFF3C2415)
+      ..strokeWidth = 1.2
       ..style = PaintingStyle.stroke;
 
     // 10条横线
@@ -74,8 +101,8 @@ class BoardPainter extends CustomPainter {
 
   void _drawPalaceDiagonals(Canvas canvas) {
     final paint = Paint()
-      ..color = Colors.black
-      ..strokeWidth = 1.5
+      ..color = const Color(0xFF3C2415)
+      ..strokeWidth = 1.2
       ..style = PaintingStyle.stroke;
 
     // 黑方九宫 (col 3-5, row 0-2)
@@ -103,35 +130,82 @@ class BoardPainter extends CustomPainter {
     );
   }
 
+  /// 绘制炮/兵位置的星位标记（十字花）
+  void _drawStarPoints(Canvas canvas) {
+    final paint = Paint()
+      ..color = const Color(0xFF3C2415)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final d = cellSize * 0.12;
+    final gap = cellSize * 0.04;
+
+    // 炮位
+    _drawStar(canvas, 1, 2, paint, d, gap);
+    _drawStar(canvas, 7, 2, paint, d, gap);
+    _drawStar(canvas, 1, 7, paint, d, gap);
+    _drawStar(canvas, 7, 7, paint, d, gap);
+
+    // 兵/卒位
+    for (int c in [0, 2, 4, 6, 8]) {
+      _drawStar(canvas, c, 3, paint, d, gap);
+      _drawStar(canvas, c, 6, paint, d, gap);
+    }
+  }
+
+  void _drawStar(Canvas canvas, int col, int row, Paint paint, double d, double gap) {
+    final x = offsetX + col * cellSize;
+    final y = offsetY + row * cellSize;
+
+    // 四个角各画一个 L 形
+    void drawCorner(double dx, double dy) {
+      final sx = x + dx * gap;
+      final sy = y + dy * gap;
+      canvas.drawLine(Offset(sx, sy), Offset(sx + dx * d, sy), paint);
+      canvas.drawLine(Offset(sx, sy), Offset(sx, sy + dy * d), paint);
+    }
+
+    // 左边不画左侧角（col == 0），右边不画右侧角（col == 8）
+    if (col > 0) {
+      drawCorner(-1, -1);
+      drawCorner(-1, 1);
+    }
+    if (col < 8) {
+      drawCorner(1, -1);
+      drawCorner(1, 1);
+    }
+  }
+
   void _drawRiverText(Canvas canvas) {
     final textStyle = TextStyle(
-      fontSize: cellSize * 0.55,
-      color: Colors.black54,
+      fontSize: cellSize * 0.5,
+      color: const Color(0xFF6B3A1F),
       fontWeight: FontWeight.bold,
+      letterSpacing: cellSize * 0.3,
     );
 
     // "楚河" 在左侧
     final chuHePainter = TextPainter(
-      text: TextSpan(text: '楚  河', style: textStyle),
+      text: TextSpan(text: '楚河', style: textStyle),
       textDirection: TextDirection.ltr,
     )..layout();
     chuHePainter.paint(
       canvas,
       Offset(
-        offsetX + 1 * cellSize - chuHePainter.width / 2,
+        offsetX + 1.5 * cellSize - chuHePainter.width / 2,
         offsetY + 4.5 * cellSize - chuHePainter.height / 2,
       ),
     );
 
     // "汉界" 在右侧
     final hanJiePainter = TextPainter(
-      text: TextSpan(text: '汉  界', style: textStyle),
+      text: TextSpan(text: '汉界', style: textStyle),
       textDirection: TextDirection.ltr,
     )..layout();
     hanJiePainter.paint(
       canvas,
       Offset(
-        offsetX + 7 * cellSize - hanJiePainter.width / 2,
+        offsetX + 6.5 * cellSize - hanJiePainter.width / 2,
         offsetY + 4.5 * cellSize - hanJiePainter.height / 2,
       ),
     );

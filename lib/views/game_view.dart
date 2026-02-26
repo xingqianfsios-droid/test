@@ -7,23 +7,40 @@ import 'board_painter.dart';
 import 'piece_widget.dart';
 import 'valid_move_indicator.dart';
 
+/// 古风色彩常量
+const _kParchment = Color(0xFFF5E6C8);
+const _kInk = Color(0xFF3C2415);
+const _kGold = Color(0xFF8B6914);
+const _kGoldLight = Color(0xFFD4A84B);
+const _kBamboo = Color(0xFFE8D5B0);
+const _kRedInk = Color(0xFFA01010);
+
 class GameView extends GetView<GameController> {
   const GameView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _kParchment,
       appBar: AppBar(
-        title: const Text('象棋 Pro'),
+        backgroundColor: _kInk,
+        foregroundColor: _kBamboo,
+        title: const Text('对 弈'),
         centerTitle: true,
+        titleTextStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: _kBamboo,
+          letterSpacing: 8,
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => _showExitConfirm(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline),
-            tooltip: '象棋规则',
+            icon: const Icon(Icons.auto_stories),
+            tooltip: '棋谱规则',
             onPressed: () => _showRulesDialog(context),
           ),
           Obx(() => IconButton(
@@ -77,11 +94,7 @@ class GameView extends GetView<GameController> {
     final maxW = constraints.maxWidth;
     final maxH = constraints.maxHeight;
 
-    // 棋盘总宽 = cellSize * 8 + pieceSize = cellSize * 8.88
-    // 棋盘总高 = cellSize * 9 + pieceSize = cellSize * 9.88
-    // 宽度填满可用空间（外层已有 16px 水平 padding）
     final cellByWidth = maxW / 8.88;
-    // 高度仅留极小上下边距，尽量拉高
     final cellByHeight = (maxH - 8) / 9.88;
     final cellSize = cellByWidth < cellByHeight ? cellByWidth : cellByHeight;
 
@@ -181,24 +194,35 @@ class GameView extends GetView<GameController> {
               if (controller.isPaused.value)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black54,
+                    color: const Color(0xCC2C1810),
                     child: Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.pause_circle_filled,
-                              size: 64, color: Colors.white),
+                          const Icon(Icons.pause_circle_outlined,
+                              size: 64, color: _kGoldLight),
                           const SizedBox(height: 16),
-                          const Text('游戏暂停',
+                          const Text('暂 停',
                               style: TextStyle(
-                                  fontSize: 24,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold)),
+                                  fontSize: 28,
+                                  color: _kBamboo,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 12)),
                           const SizedBox(height: 24),
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.play_arrow),
-                            label: const Text('继续游戏'),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _kGold,
+                              foregroundColor: _kParchment,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 32, vertical: 12),
+                            ),
                             onPressed: () => controller.resumeGame(),
+                            child: const Text('继续对弈',
+                                style: TextStyle(
+                                    fontSize: 16, letterSpacing: 4)),
                           ),
                         ],
                       ),
@@ -223,8 +247,14 @@ class GameView extends GetView<GameController> {
       if (controller.isGameOver.value && Get.isDialogOpen != true) {
         Get.dialog(
           AlertDialog(
-            title: const Text('游戏结束'),
-            content: Text('$winnerText获胜！'),
+            backgroundColor: _kParchment,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: _kGold, width: 1.5),
+            ),
+            title: const Text('对弈结束', style: TextStyle(color: _kInk)),
+            content: Text('$winnerText获胜！',
+                style: const TextStyle(fontSize: 18, color: Color(0xFF5C3A1E))),
             actions: [
               TextButton(
                 onPressed: () {
@@ -246,8 +276,13 @@ class GameView extends GetView<GameController> {
   void _showResetConfirm(BuildContext context) {
     Get.dialog(
       AlertDialog(
-        title: const Text('重新开始'),
-        content: const Text('确定要重新开始游戏吗？'),
+        backgroundColor: _kParchment,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: _kGold, width: 1.5),
+        ),
+        title: const Text('重新开局', style: TextStyle(color: _kInk)),
+        content: const Text('确定要重新开始对弈吗？'),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
@@ -269,15 +304,20 @@ class GameView extends GetView<GameController> {
     controller.pauseGame();
     Get.dialog(
       AlertDialog(
-        title: const Text('返回首页'),
-        content: const Text('当前对局将会丢失，确定返回首页吗？'),
+        backgroundColor: _kParchment,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: _kGold, width: 1.5),
+        ),
+        title: const Text('返回首页', style: TextStyle(color: _kInk)),
+        content: const Text('当前对局将会丢失，确定返回吗？'),
         actions: [
           TextButton(
             onPressed: () {
               Get.back();
               controller.resumeGame();
             },
-            child: const Text('继续游戏'),
+            child: const Text('继续对弈'),
           ),
           TextButton(
             onPressed: () {
@@ -294,11 +334,16 @@ class GameView extends GetView<GameController> {
   void _showRulesDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
+        backgroundColor: _kParchment,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: _kGold, width: 1.5),
+        ),
         title: const Row(
           children: [
-            Icon(Icons.menu_book, color: Colors.brown),
+            Icon(Icons.auto_stories, color: _kGold),
             SizedBox(width: 8),
-            Text('象棋规则'),
+            Text('棋谱规则', style: TextStyle(color: _kInk)),
           ],
         ),
         content: const SingleChildScrollView(
@@ -313,7 +358,7 @@ class GameView extends GetView<GameController> {
               _RuleSection(title: '车', content: '横竖直线任意移动，不能越过其他棋子。可以吃路径上第一个遇到的对方棋子。'),
               _RuleSection(title: '炮', content: '移动方式与车相同（直线）。但吃子时必须翻过恰好一个棋子（炮架），吃掉炮架后面的第一个对方棋子。'),
               _RuleSection(title: '兵/卒', content: '未过河前只能向前走一步。过河后可以向前、向左或向右走一步，但不能后退。'),
-              Divider(),
+              Divider(color: _kGold),
               _RuleSection(title: '胜负判定', content: '将对方的帅/将吃掉或使其无路可走（绝杀/困毙）即获胜。'),
               _RuleSection(title: '倒计时', content: '每步棋有30秒的思考时间。倒计时10秒时会有声音提示，超时系统将自动帮你走一步棋。'),
             ],
@@ -322,7 +367,7 @@ class GameView extends GetView<GameController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('知道了'),
+            child: const Text('知晓'),
           ),
         ],
       ),
@@ -343,11 +388,11 @@ class _RuleSection extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.5),
+          style: const TextStyle(fontSize: 14, color: Color(0xFF5C3A1E), height: 1.6),
           children: [
             TextSpan(
               text: '$title：',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.brown),
+              style: const TextStyle(fontWeight: FontWeight.bold, color: _kGold),
             ),
             TextSpan(text: content),
           ],
@@ -357,7 +402,7 @@ class _RuleSection extends StatelessWidget {
   }
 }
 
-/// 带动画的回合状态栏（StatefulWidget 以支持 AnimationController）
+/// 带动画的回合状态栏
 class _TurnStatusBar extends StatefulWidget {
   final bool isRed;
   final bool inCheck;
@@ -419,12 +464,10 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
   @override
   void didUpdateWidget(covariant _TurnStatusBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 回合切换时触发滑入动画
     if (widget.turnVersion != _lastTurnVersion) {
       _lastTurnVersion = widget.turnVersion;
       _slideController.forward(from: 0);
       _pulseController.repeat(reverse: true);
-      // 2秒后停止脉冲
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) _pulseController.stop();
       });
@@ -447,31 +490,27 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: widget.isRed
-                  ? [const Color(0xFFEFDBBE), const Color(0xFFF5E6D0)]
-                  : [Colors.blueGrey.shade100, Colors.grey.shade200],
+                  ? [const Color(0xFFECDBC0), const Color(0xFFF2E4CC)]
+                  : [const Color(0xFFD6CEBF), const Color(0xFFE0D8CA)],
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            border: const Border(
+              bottom: BorderSide(color: Color(0x30000000), width: 1),
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 走棋方指示圆点
+              // 走棋方指示
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 width: 14,
                 height: 14,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.isRed ? const Color(0xFFC62828) : Colors.black,
+                  color: widget.isRed ? _kRedInk : const Color(0xFF1A1A1A),
                   boxShadow: [
                     BoxShadow(
-                      color: (widget.isRed ? const Color(0xFFC62828) : Colors.black)
+                      color: (widget.isRed ? _kRedInk : const Color(0xFF1A1A1A))
                           .withValues(alpha: 0.4),
                       blurRadius: 6,
                     ),
@@ -481,11 +520,12 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
               const SizedBox(width: 10),
               // 回合文字
               Text(
-                '$turnText走棋$checkText',
+                '$turnText执棋$checkText',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
-                  color: widget.inCheck ? const Color(0xFFC62828) : Colors.black87,
+                  color: widget.inCheck ? _kRedInk : _kInk,
+                  letterSpacing: 2,
                 ),
               ),
               const SizedBox(width: 16),
@@ -495,19 +535,19 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: widget.isPaused
-                      ? Colors.grey
+                      ? const Color(0xFF8B8B7A)
                       : isWarning
-                          ? const Color(0xFFC62828)
-                          : Colors.black54,
-                  borderRadius: BorderRadius.circular(12),
+                          ? _kRedInk
+                          : _kInk,
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   widget.isPaused ? '暂停' : '${widget.countdown}s',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: widget.isPaused ? 0 : (isWarning ? 1.0 : 0),
+                    color: _kBamboo,
+                    letterSpacing: widget.isPaused ? 2 : (isWarning ? 1.0 : 0),
                   ),
                 ),
               ),

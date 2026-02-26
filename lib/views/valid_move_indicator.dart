@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// 合法走位提示指示器
+/// 合法走位提示指示器 — 水墨风格
 class ValidMoveIndicator extends StatelessWidget {
   /// 小圆点（空位可走）还是空心圆环（可吃子）
   final bool isCapture;
@@ -15,26 +15,26 @@ class ValidMoveIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isCapture) {
-      // 可吃子：空心圆环
+      // 可吃子：深色虚环
       return Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: Colors.green.withValues(alpha: 0.7),
+            color: const Color(0xFF8B6914).withValues(alpha: 0.7),
             width: 2.5,
           ),
         ),
       );
     } else {
-      // 空位可走：小圆点
+      // 空位可走：墨色小圆点
       return Container(
-        width: size * 0.35,
-        height: size * 0.35,
+        width: size * 0.3,
+        height: size * 0.3,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.green.withValues(alpha: 0.5),
+          color: const Color(0xFF3C2415).withValues(alpha: 0.45),
         ),
       );
     }

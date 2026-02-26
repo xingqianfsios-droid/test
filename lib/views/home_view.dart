@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+/// 古风色彩常量
+const _kParchment = Color(0xFFF5E6C8);
+const _kInk = Color(0xFF3C2415);
+const _kGold = Color(0xFF8B6914);
+const _kGoldLight = Color(0xFFD4A84B);
+const _kBamboo = Color(0xFFE8D5B0);
+
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -9,14 +16,14 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFF5D4037),
-              const Color(0xFF4E342E),
-              const Color(0xFF3E2723),
+              Color(0xFF2C1810),
+              Color(0xFF3C2415),
+              Color(0xFF2C1810),
             ],
           ),
         ),
@@ -24,83 +31,105 @@ class HomeView extends StatelessWidget {
           child: Column(
             children: [
               const Spacer(flex: 2),
+
+              // 顶部装饰线
+              _buildDivider(),
+              const SizedBox(height: 32),
+
               // 标题
               const Text(
-                '象棋',
+                '象 棋',
                 style: TextStyle(
-                  fontSize: 56,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 16,
+                  fontSize: 60,
+                  fontWeight: FontWeight.w900,
+                  color: _kGoldLight,
+                  letterSpacing: 24,
+                  height: 1.2,
                   shadows: [
                     Shadow(
-                      blurRadius: 12,
-                      color: Colors.black54,
-                      offset: Offset(2, 4),
+                      blurRadius: 20,
+                      color: Color(0x80D4A84B),
+                      offset: Offset(0, 2),
+                    ),
+                    Shadow(
+                      blurRadius: 4,
+                      color: Color(0xFF1A0E08),
+                      offset: Offset(2, 3),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
-                'Xiangqi Pro',
+                '- 楚 河 汉 界 -',
                 style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white.withValues(alpha: 0.7),
-                  letterSpacing: 4,
+                  fontSize: 15,
+                  color: _kBamboo.withValues(alpha: 0.6),
+                  letterSpacing: 8,
                 ),
               ),
+
+              const SizedBox(height: 32),
+              _buildDivider(),
+
               const Spacer(flex: 3),
+
               // 开始游戏按钮
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 52,
+                  height: 54,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFD4A04A),
-                      foregroundColor: Colors.white,
+                      backgroundColor: _kGold,
+                      foregroundColor: _kParchment,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(26),
+                        borderRadius: BorderRadius.circular(8),
+                        side: const BorderSide(color: _kGoldLight, width: 1),
                       ),
-                      elevation: 6,
+                      elevation: 8,
+                      shadowColor: const Color(0x80000000),
                       textStyle: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 4,
+                        letterSpacing: 8,
                       ),
                     ),
                     onPressed: () => Get.toNamed('/game'),
-                    child: const Text('开始游戏'),
+                    child: const Text('开始对弈'),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               // 游戏规则按钮
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 52,
+                  height: 54,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.white54, width: 1.5),
+                      foregroundColor: _kBamboo,
+                      side: BorderSide(
+                        color: _kBamboo.withValues(alpha: 0.4),
+                        width: 1,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(26),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       textStyle: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        letterSpacing: 4,
+                        letterSpacing: 8,
                       ),
                     ),
                     onPressed: () => _showRulesDialog(context),
-                    child: const Text('游戏规则'),
+                    child: const Text('棋谱规则'),
                   ),
                 ),
               ),
+
               const Spacer(flex: 2),
             ],
           ),
@@ -109,14 +138,66 @@ class HomeView extends StatelessWidget {
     );
   }
 
+  Widget _buildDivider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 60),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    _kGoldLight.withValues(alpha: 0.6),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Container(
+              width: 6,
+              height: 6,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: _kGoldLight,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    _kGoldLight.withValues(alpha: 0.6),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showRulesDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
+        backgroundColor: _kParchment,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: _kGold, width: 1.5),
+        ),
         title: const Row(
           children: [
-            Icon(Icons.menu_book, color: Colors.brown),
+            Icon(Icons.auto_stories, color: _kGold),
             SizedBox(width: 8),
-            Text('象棋规则'),
+            Text('棋谱规则', style: TextStyle(color: _kInk)),
           ],
         ),
         content: const SingleChildScrollView(
@@ -131,7 +212,7 @@ class HomeView extends StatelessWidget {
               _RuleSection(title: '车', content: '横竖直线任意移动，不能越过其他棋子。可以吃路径上第一个遇到的对方棋子。'),
               _RuleSection(title: '炮', content: '移动方式与车相同（直线）。但吃子时必须翻过恰好一个棋子（炮架），吃掉炮架后面的第一个对方棋子。'),
               _RuleSection(title: '兵/卒', content: '未过河前只能向前走一步。过河后可以向前、向左或向右走一步，但不能后退。'),
-              Divider(),
+              Divider(color: _kGold),
               _RuleSection(title: '胜负判定', content: '将对方的帅/将吃掉或使其无路可走（绝杀/困毙）即获胜。'),
               _RuleSection(title: '倒计时', content: '每步棋有30秒的思考时间。倒计时10秒时会有声音提示，超时系统将自动帮你走一步棋。'),
             ],
@@ -140,7 +221,7 @@ class HomeView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('知道了'),
+            child: const Text('知晓'),
           ),
         ],
       ),
@@ -160,11 +241,11 @@ class _RuleSection extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: RichText(
         text: TextSpan(
-          style: const TextStyle(fontSize: 14, color: Colors.black87, height: 1.5),
+          style: const TextStyle(fontSize: 14, color: Color(0xFF5C3A1E), height: 1.6),
           children: [
             TextSpan(
               text: '$title：',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.brown),
+              style: const TextStyle(fontWeight: FontWeight.bold, color: _kGold),
             ),
             TextSpan(text: content),
           ],
