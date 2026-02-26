@@ -25,6 +25,9 @@ class GameController extends GetxController {
   /// 游戏是否结束
   final isGameOver = false.obs;
 
+  /// 是否暂停
+  final isPaused = false.obs;
+
   /// 赢家
   final winner = Rx<PieceSide?>(null);
 
@@ -62,6 +65,7 @@ class GameController extends GetxController {
     validMoves.clear();
     inCheck.value = false;
     isGameOver.value = false;
+    isPaused.value = false;
     winner.value = null;
     turnVersion.value = 0;
     _restartTimer();
@@ -82,7 +86,13 @@ class GameController extends GetxController {
     _timer = null;
   }
 
+  void _resumeTimer() {
+    _stopTimer();
+    _timer = Timer.periodic(const Duration(seconds: 1), _onTick);
+  }
+
   void _onTick(Timer timer) {
+    if (isPaused.value) return;
     if (isGameOver.value) {
       _stopTimer();
       return;
@@ -140,6 +150,7 @@ class GameController extends GetxController {
 
   /// 统一点击处理
   void onBoardTap(int col, int row) {
+    if (isPaused.value) return;
     if (isGameOver.value) return;
 
     final board = buildBoard(pieces);
@@ -243,6 +254,20 @@ class GameController extends GetxController {
           currentSide == PieceSide.red ? PieceSide.black : PieceSide.red;
       _stopTimer();
     }
+  }
+
+  /// 暂停游戏
+  void pauseGame() {
+    if (isGameOver.value) return;
+    isPaused.value = true;
+    _stopTimer();
+  }
+
+  /// 恢复游戏
+  void resumeGame() {
+    if (isGameOver.value) return;
+    isPaused.value = false;
+    _resumeTimer();
   }
 
   /// 选中棋子（保留向后兼容）

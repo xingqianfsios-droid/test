@@ -12,6 +12,7 @@ void main() {
     expect(find.text('象棋 Pro'), findsOneWidget);
     expect(find.byIcon(Icons.refresh), findsOneWidget);
     expect(find.byIcon(Icons.help_outline), findsOneWidget);
+    expect(find.byIcon(Icons.pause), findsOneWidget);
 
     // 清理 GetX controller 中的 Timer
     final controller = Get.find<GameController>();

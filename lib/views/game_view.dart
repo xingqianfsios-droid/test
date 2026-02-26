@@ -22,6 +22,19 @@ class GameView extends GetView<GameController> {
             tooltip: '象棋规则',
             onPressed: () => _showRulesDialog(context),
           ),
+          Obx(() => IconButton(
+                icon: Icon(controller.isPaused.value
+                    ? Icons.play_arrow
+                    : Icons.pause),
+                tooltip: controller.isPaused.value ? '继续' : '暂停',
+                onPressed: () {
+                  if (controller.isPaused.value) {
+                    controller.resumeGame();
+                  } else {
+                    controller.pauseGame();
+                  }
+                },
+              )),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _showResetConfirm(context),
@@ -36,6 +49,7 @@ class GameView extends GetView<GameController> {
                 inCheck: controller.inCheck.value,
                 countdown: controller.countdown.value,
                 turnVersion: controller.turnVersion.value,
+                isPaused: controller.isPaused.value,
               )),
           // 棋盘区域：左右各 16px 间隙
           Expanded(
@@ -158,6 +172,35 @@ class GameView extends GetView<GameController> {
                   ),
                 );
               }),
+
+              // 暂停遮罩
+              if (controller.isPaused.value)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.pause_circle_filled,
+                              size: 64, color: Colors.white),
+                          const SizedBox(height: 16),
+                          const Text('游戏暂停',
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.play_arrow),
+                            label: const Text('继续游戏'),
+                            onPressed: () => controller.resumeGame(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
 
               // 游戏结束对话框触发
               if (controller.isGameOver.value)
@@ -290,12 +333,14 @@ class _TurnStatusBar extends StatefulWidget {
   final bool inCheck;
   final int countdown;
   final int turnVersion;
+  final bool isPaused;
 
   const _TurnStatusBar({
     required this.isRed,
     required this.inCheck,
     required this.countdown,
     required this.turnVersion,
+    required this.isPaused,
   });
 
   @override
@@ -419,18 +464,20 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
                 duration: const Duration(milliseconds: 300),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isWarning
-                      ? Colors.red.shade600
-                      : Colors.black54,
+                  color: widget.isPaused
+                      ? Colors.grey
+                      : isWarning
+                          ? Colors.red.shade600
+                          : Colors.black54,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  '${widget.countdown}s',
+                  widget.isPaused ? '暂停' : '${widget.countdown}s',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
-                    letterSpacing: isWarning ? 1.0 : 0,
+                    letterSpacing: widget.isPaused ? 0 : (isWarning ? 1.0 : 0),
                   ),
                 ),
               ),
