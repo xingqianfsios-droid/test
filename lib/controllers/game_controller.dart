@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:get/get.dart';
 import '../models/piece_model.dart';
 import '../models/board_state.dart';
 import '../core/move_validator.dart';
+import '../core/sound_service.dart';
 
 class GameController extends GetxController {
   /// 棋盘上的所有棋子
@@ -25,10 +28,30 @@ class GameController extends GetxController {
   /// 赢家
   final winner = Rx<PieceSide?>(null);
 
+  /// 倒计时秒数
+  final countdown = 30.obs;
+
+  /// 回合版本号（每次切换回合+1，用于触发动画）
+  final turnVersion = 0.obs;
+
+  static const int maxCountdown = 30;
+  static const int warningThreshold = 10;
+
+  Timer? _timer;
+  final SoundService _sound = SoundService();
+  final _random = Random();
+
   @override
   void onInit() {
     super.onInit();
     resetBoard();
+  }
+
+  @override
+  void onClose() {
+    _stopTimer();
+    _sound.dispose();
+    super.onClose();
   }
 
   /// 重置棋盘到初始状态
@@ -40,29 +63,97 @@ class GameController extends GetxController {
     inCheck.value = false;
     isGameOver.value = false;
     winner.value = null;
+    turnVersion.value = 0;
+    _restartTimer();
   }
+
+  // ============================================================
+  // 倒计时逻辑
+  // ============================================================
+
+  void _restartTimer() {
+    _stopTimer();
+    countdown.value = maxCountdown;
+    _timer = Timer.periodic(const Duration(seconds: 1), _onTick);
+  }
+
+  void _stopTimer() {
+    _timer?.cancel();
+    _timer = null;
+  }
+
+  void _onTick(Timer timer) {
+    if (isGameOver.value) {
+      _stopTimer();
+      return;
+    }
+
+    countdown.value--;
+
+    // 10秒时播放提示音
+    if (countdown.value == warningThreshold) {
+      _sound.playBeep();
+    }
+    // 每秒 <= 5 秒也播放提示音
+    if (countdown.value > 0 && countdown.value <= 5) {
+      _sound.playBeep();
+    }
+
+    // 超时自动走子
+    if (countdown.value <= 0) {
+      _stopTimer();
+      _autoMove();
+    }
+  }
+
+  /// 超时自动走子：随机选一个有合法走法的己方棋子，随机走一步
+  void _autoMove() {
+    final board = buildBoard(pieces);
+    final side = currentTurn.value;
+
+    // 收集所有有合法走法的己方棋子
+    final candidates = <(int pieceIndex, List<({int col, int row})> moves)>[];
+    for (int i = 0; i < pieces.length; i++) {
+      final p = pieces[i];
+      if (p.side != side) continue;
+      final moves = getValidMoves(piece: p, board: board);
+      if (moves.isNotEmpty) {
+        candidates.add((i, moves));
+      }
+    }
+
+    if (candidates.isEmpty) return;
+
+    // 随机选一个棋子和一个走法
+    final chosen = candidates[_random.nextInt(candidates.length)];
+    final move = chosen.$2[_random.nextInt(chosen.$2.length)];
+
+    // 选中并执行
+    selectedIndex.value = chosen.$1;
+    validMoves.value = chosen.$2;
+    _executeMove(move.col, move.row);
+  }
+
+  // ============================================================
+  // 点击 & 走子逻辑
+  // ============================================================
 
   /// 统一点击处理
   void onBoardTap(int col, int row) {
     if (isGameOver.value) return;
 
     final board = buildBoard(pieces);
-
-    // 检查点击位置是否有棋子
     final tappedPiece = board[row][col];
 
     if (selectedIndex.value == -1) {
-      // 未选中状态：选择己方棋子
       if (tappedPiece != null && tappedPiece.side == currentTurn.value) {
         _selectPiece(tappedPiece, board);
       }
     } else {
       final selected = pieces[selectedIndex.value];
 
-      // 点击了己方另一个棋子：切换选择
       if (tappedPiece != null && tappedPiece.side == currentTurn.value) {
         if (tappedPiece.col == selected.col && tappedPiece.row == selected.row) {
-          // 点击同一个棋子：取消选择
           _clearSelection();
         } else {
           _selectPiece(tappedPiece, board);
@@ -70,19 +161,16 @@ class GameController extends GetxController {
         return;
       }
 
-      // 检查是否为合法走位
       final isValid = validMoves.any((m) => m.col == col && m.row == row);
       if (isValid) {
         _executeMove(col, row);
       } else {
-        // 点击无效位置：取消选择
         _clearSelection();
       }
     }
   }
 
   void _selectPiece(PieceModel piece, List<List<PieceModel?>> board) {
-    // 找到该棋子在 pieces 列表中的索引
     final index = pieces.indexWhere(
       (p) => p.col == piece.col && p.row == piece.row,
     );
@@ -101,7 +189,6 @@ class GameController extends GetxController {
   void _executeMove(int targetCol, int targetRow) {
     final selected = pieces[selectedIndex.value];
 
-    // 移除被吃的棋子
     final capturedIndex = pieces.indexWhere(
       (p) => p.col == targetCol && p.row == targetRow,
     );
@@ -110,12 +197,10 @@ class GameController extends GetxController {
 
     if (capturedIndex != -1) {
       newPieces.removeAt(capturedIndex);
-      // 调整选中索引（如果被吃棋子在选中棋子前面）
       final adjustedSelectedIndex =
           capturedIndex < selectedIndex.value
               ? selectedIndex.value - 1
               : selectedIndex.value;
-      // 更新棋子位置
       newPieces[adjustedSelectedIndex] = selected.copyWith(
         col: targetCol,
         row: targetRow,
@@ -134,9 +219,15 @@ class GameController extends GetxController {
     final nextSide =
         currentTurn.value == PieceSide.red ? PieceSide.black : PieceSide.red;
     currentTurn.value = nextSide;
+    turnVersion.value++;
 
     // 检查游戏状态
     _checkGameState();
+
+    // 重启倒计时
+    if (!isGameOver.value) {
+      _restartTimer();
+    }
   }
 
   /// 检查游戏状态
@@ -144,15 +235,13 @@ class GameController extends GetxController {
     final board = buildBoard(pieces);
     final currentSide = currentTurn.value;
 
-    // 检查是否被将
     inCheck.value = isInCheck(currentSide, board);
 
-    // 检查对方是否还有合法走法
     if (!hasLegalMoves(currentSide, board)) {
       isGameOver.value = true;
-      // 无合法走法的一方输
       winner.value =
           currentSide == PieceSide.red ? PieceSide.black : PieceSide.red;
+      _stopTimer();
     }
   }
 

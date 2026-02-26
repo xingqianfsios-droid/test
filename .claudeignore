@@ -1,0 +1,40 @@
+# Build outputs
+build/
+.dart_tool/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Platform generated files
+android/.gradle/
+android/app/build/
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+linux/flutter/
+macos/Flutter/
+windows/flutter/
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Packages
+.packages
+.pub-cache/
+.pub/
+
+# Assets (optional, depending on size)
+# assets/images/
+# assets/fonts/
+
+# Misc
+*.lock
+coverage/
