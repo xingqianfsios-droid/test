@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'controllers/game_controller.dart';
+import 'views/home_view.dart';
 import 'views/game_view.dart';
 
 void main() {
@@ -17,10 +18,17 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
       ),
-      home: const GameView(),
-      initialBinding: BindingsBuilder(() {
-        Get.put(GameController());
-      }),
+      initialRoute: '/',
+      getPages: [
+        GetPage(name: '/', page: () => const HomeView()),
+        GetPage(
+          name: '/game',
+          page: () => const GameView(),
+          binding: BindingsBuilder(() {
+            Get.put(GameController());
+          }),
+        ),
+      ],
     );
   }
 }

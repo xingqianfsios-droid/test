@@ -69,6 +69,7 @@ class GameController extends GetxController {
     winner.value = null;
     turnVersion.value = 0;
     _restartTimer();
+    _sound.playStart();
   }
 
   // ============================================================
@@ -225,6 +226,13 @@ class GameController extends GetxController {
 
     pieces.value = newPieces;
     _clearSelection();
+
+    // 播放音效
+    if (capturedIndex != -1) {
+      _sound.playCapture();
+    } else {
+      _sound.playMove();
+    }
 
     // 切换回合
     final nextSide =
