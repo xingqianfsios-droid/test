@@ -37,13 +37,16 @@ class GameView extends GetView<GameController> {
                 countdown: controller.countdown.value,
                 turnVersion: controller.turnVersion.value,
               )),
-          // 棋盘区域
+          // 棋盘区域：左右各 16px 间隙
           Expanded(
-            child: Center(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return _buildBoard(constraints);
-                },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Center(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return _buildBoard(constraints);
+                  },
+                ),
               ),
             ),
           ),
@@ -56,9 +59,12 @@ class GameView extends GetView<GameController> {
     final maxW = constraints.maxWidth;
     final maxH = constraints.maxHeight;
 
-    // 优化棋盘大小：减少边距，尽量利用屏幕空间
-    final cellByWidth = (maxW - 16) / 8;
-    final cellByHeight = (maxH - 16) / 9;
+    // 棋盘总宽 = cellSize * 8 + pieceSize = cellSize * 8.88
+    // 棋盘总高 = cellSize * 9 + pieceSize = cellSize * 9.88
+    // 宽度填满可用空间（外层已有 16px 水平 padding）
+    final cellByWidth = maxW / 8.88;
+    // 高度仅留极小上下边距，尽量拉高
+    final cellByHeight = (maxH - 8) / 9.88;
     final cellSize = cellByWidth < cellByHeight ? cellByWidth : cellByHeight;
 
     final boardWidth = cellSize * 8;
