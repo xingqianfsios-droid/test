@@ -17,6 +17,7 @@ void main() {
     test('棋盘中央的马应有8个合法走位', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
@@ -52,6 +53,7 @@ void main() {
     test('左上角(0,0)的马只有2个合法走位', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 0,
@@ -75,6 +77,7 @@ void main() {
     test('右下角(8,9)的马只有2个合法走位', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 8,
@@ -98,6 +101,7 @@ void main() {
     test('边缘位置(0,5)的马应有4个合法走位', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 0,
@@ -125,6 +129,7 @@ void main() {
     test('上方被别腿，应阻挡向上的两个目标', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
@@ -132,6 +137,7 @@ void main() {
       );
       // 在马的正上方放一个棋子别腿
       const blocker = PieceModel(
+        id: 'p2',
         type: PieceType.soldier,
         side: PieceSide.black,
         col: 4,
@@ -157,12 +163,14 @@ void main() {
     test('下方被别腿，应阻挡向下的两个目标', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
         row: 5,
       );
       const blocker = PieceModel(
+        id: 'p2',
         type: PieceType.soldier,
         side: PieceSide.red,
         col: 4,
@@ -187,12 +195,14 @@ void main() {
     test('左方被别腿，应阻挡向左的两个目标', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
         row: 5,
       );
       const blocker = PieceModel(
+        id: 'p2',
         type: PieceType.cannon,
         side: PieceSide.black,
         col: 3,
@@ -217,12 +227,14 @@ void main() {
     test('右方被别腿，应阻挡向右的两个目标', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
         row: 5,
       );
       const blocker = PieceModel(
+        id: 'p2',
         type: PieceType.chariot,
         side: PieceSide.red,
         col: 5,
@@ -247,6 +259,7 @@ void main() {
     test('四面全被别腿，马无路可走', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
@@ -254,10 +267,10 @@ void main() {
       );
       place(board, horse);
       // 四个方向各放一个棋子
-      place(board, const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 4));
-      place(board, const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 6));
-      place(board, const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 3, row: 5));
-      place(board, const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 5, row: 5));
+      place(board, const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 4));
+      place(board, const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 6));
+      place(board, const PieceModel(id: 'p4', type: PieceType.soldier, side: PieceSide.red, col: 3, row: 5));
+      place(board, const PieceModel(id: 'p5', type: PieceType.soldier, side: PieceSide.red, col: 5, row: 5));
 
       final moves = getHorseMoves(
         col: 4,
@@ -272,6 +285,7 @@ void main() {
     test('己方棋子别腿和对方棋子别腿效果相同', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
@@ -279,14 +293,14 @@ void main() {
       );
       place(board, horse);
       // 用己方棋子别上方
-      place(board, const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 4));
+      place(board, const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 4));
 
       final movesWithFriendly = getHorseMoves(
         col: 4, row: 5, side: PieceSide.red, board: board,
       );
 
       // 替换为对方棋子
-      board[4][4] = const PieceModel(type: PieceType.soldier, side: PieceSide.black, col: 4, row: 4);
+      board[4][4] = const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.black, col: 4, row: 4);
 
       final movesWithEnemy = getHorseMoves(
         col: 4, row: 5, side: PieceSide.red, board: board,
@@ -301,12 +315,14 @@ void main() {
     test('目标位置有对方棋子可以吃', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
         row: 5,
       );
       const enemy = PieceModel(
+        id: 'p2',
         type: PieceType.cannon,
         side: PieceSide.black,
         col: 3,
@@ -329,12 +345,14 @@ void main() {
     test('目标位置有己方棋子不能走', () {
       final board = emptyBoard();
       const horse = PieceModel(
+        id: 'p1',
         type: PieceType.horse,
         side: PieceSide.red,
         col: 4,
         row: 5,
       );
       const friendly = PieceModel(
+        id: 'p2',
         type: PieceType.cannon,
         side: PieceSide.red,
         col: 3,
@@ -359,8 +377,8 @@ void main() {
   group('马的合法走位 - 使用 buildBoard 辅助函数', () {
     test('buildBoard 正确构建棋盘', () {
       final pieces = [
-        const PieceModel(type: PieceType.horse, side: PieceSide.red, col: 1, row: 9),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.red, col: 0, row: 9),
+        const PieceModel(id: 'p1', type: PieceType.horse, side: PieceSide.red, col: 1, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.chariot, side: PieceSide.red, col: 0, row: 9),
       ];
       final board = buildBoard(pieces);
 
@@ -372,9 +390,9 @@ void main() {
     test('初始局面红方左马的合法走位', () {
       // 初始局面: 红马在 (1,9)，马腿上方 (1,8) 无棋子，左方 (0,9) 有车
       final pieces = [
-        const PieceModel(type: PieceType.chariot, side: PieceSide.red, col: 0, row: 9),
-        const PieceModel(type: PieceType.horse, side: PieceSide.red, col: 1, row: 9),
-        const PieceModel(type: PieceType.elephant, side: PieceSide.red, col: 2, row: 9),
+        const PieceModel(id: 'p1', type: PieceType.chariot, side: PieceSide.red, col: 0, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.horse, side: PieceSide.red, col: 1, row: 9),
+        const PieceModel(id: 'p3', type: PieceType.elephant, side: PieceSide.red, col: 2, row: 9),
       ];
       final board = buildBoard(pieces);
 

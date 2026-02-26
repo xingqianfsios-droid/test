@@ -37,6 +37,9 @@ enum PieceSide {
 @freezed
 class PieceModel with _$PieceModel {
   const factory PieceModel({
+    /// 棋子唯一标识（用于 UI key 稳定性）
+    required String id,
+
     required PieceType type,
     required PieceSide side,
 

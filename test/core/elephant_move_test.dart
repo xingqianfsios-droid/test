@@ -6,7 +6,7 @@ void main() {
   group('相/象 (Elephant) 走法测试', () {
     test('红相在中央可走4步', () {
       final pieces = [
-        const PieceModel(type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
+        const PieceModel(id: 'p1', type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
       ];
       final board = buildBoard(pieces);
       final moves = getElephantMoves(col: 4, row: 7, side: PieceSide.red, board: board);
@@ -22,7 +22,7 @@ void main() {
 
     test('红相不可过河', () {
       final pieces = [
-        const PieceModel(type: PieceType.elephant, side: PieceSide.red, col: 2, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.elephant, side: PieceSide.red, col: 2, row: 5),
       ];
       final board = buildBoard(pieces);
       final moves = getElephantMoves(col: 2, row: 5, side: PieceSide.red, board: board);
@@ -35,7 +35,7 @@ void main() {
 
     test('黑象不可过河', () {
       final pieces = [
-        const PieceModel(type: PieceType.elephant, side: PieceSide.black, col: 2, row: 4),
+        const PieceModel(id: 'p1', type: PieceType.elephant, side: PieceSide.black, col: 2, row: 4),
       ];
       final board = buildBoard(pieces);
       final moves = getElephantMoves(col: 2, row: 4, side: PieceSide.black, board: board);
@@ -47,11 +47,11 @@ void main() {
 
     test('象眼被阻塞不可走', () {
       final pieces = [
-        const PieceModel(type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
+        const PieceModel(id: 'p1', type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
         // 阻塞左上象眼
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 3, row: 6),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 3, row: 6),
         // 阻塞右上象眼
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 5, row: 6),
+        const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.red, col: 5, row: 6),
       ];
       final board = buildBoard(pieces);
       final moves = getElephantMoves(col: 4, row: 7, side: PieceSide.red, board: board);
@@ -66,11 +66,11 @@ void main() {
 
     test('全部象眼被阻塞时无走法', () {
       final pieces = [
-        const PieceModel(type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 3, row: 6),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 5, row: 6),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 3, row: 8),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 5, row: 8),
+        const PieceModel(id: 'p1', type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 3, row: 6),
+        const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.red, col: 5, row: 6),
+        const PieceModel(id: 'p4', type: PieceType.soldier, side: PieceSide.red, col: 3, row: 8),
+        const PieceModel(id: 'p5', type: PieceType.soldier, side: PieceSide.red, col: 5, row: 8),
       ];
       final board = buildBoard(pieces);
       final moves = getElephantMoves(col: 4, row: 7, side: PieceSide.red, board: board);
@@ -80,8 +80,8 @@ void main() {
 
     test('象可吃敌方棋子', () {
       final pieces = [
-        const PieceModel(type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.black, col: 2, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.elephant, side: PieceSide.red, col: 4, row: 7),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.black, col: 2, row: 5),
       ];
       final board = buildBoard(pieces);
       final moves = getElephantMoves(col: 4, row: 7, side: PieceSide.red, board: board);

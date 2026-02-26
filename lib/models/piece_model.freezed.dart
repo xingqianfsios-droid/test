@@ -21,6 +21,8 @@ PieceModel _$PieceModelFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$PieceModel {
+  /// 棋子唯一标识（用于 UI key 稳定性）
+  String get id => throw _privateConstructorUsedError;
   PieceType get type => throw _privateConstructorUsedError;
   PieceSide get side => throw _privateConstructorUsedError;
 
@@ -47,7 +49,7 @@ abstract class $PieceModelCopyWith<$Res> {
     $Res Function(PieceModel) then,
   ) = _$PieceModelCopyWithImpl<$Res, PieceModel>;
   @useResult
-  $Res call({PieceType type, PieceSide side, int col, int row});
+  $Res call({String id, PieceType type, PieceSide side, int col, int row});
 }
 
 /// @nodoc
@@ -65,6 +67,7 @@ class _$PieceModelCopyWithImpl<$Res, $Val extends PieceModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? type = null,
     Object? side = null,
     Object? col = null,
@@ -72,6 +75,10 @@ class _$PieceModelCopyWithImpl<$Res, $Val extends PieceModel>
   }) {
     return _then(
       _value.copyWith(
+            id: null == id
+                ? _value.id
+                : id // ignore: cast_nullable_to_non_nullable
+                      as String,
             type: null == type
                 ? _value.type
                 : type // ignore: cast_nullable_to_non_nullable
@@ -103,7 +110,7 @@ abstract class _$$PieceModelImplCopyWith<$Res>
   ) = __$$PieceModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({PieceType type, PieceSide side, int col, int row});
+  $Res call({String id, PieceType type, PieceSide side, int col, int row});
 }
 
 /// @nodoc
@@ -120,6 +127,7 @@ class __$$PieceModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? id = null,
     Object? type = null,
     Object? side = null,
     Object? col = null,
@@ -127,6 +135,10 @@ class __$$PieceModelImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$PieceModelImpl(
+        id: null == id
+            ? _value.id
+            : id // ignore: cast_nullable_to_non_nullable
+                  as String,
         type: null == type
             ? _value.type
             : type // ignore: cast_nullable_to_non_nullable
@@ -152,6 +164,7 @@ class __$$PieceModelImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$PieceModelImpl implements _PieceModel {
   const _$PieceModelImpl({
+    required this.id,
     required this.type,
     required this.side,
     required this.col,
@@ -161,6 +174,9 @@ class _$PieceModelImpl implements _PieceModel {
   factory _$PieceModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$PieceModelImplFromJson(json);
 
+  /// 棋子唯一标识（用于 UI key 稳定性）
+  @override
+  final String id;
   @override
   final PieceType type;
   @override
@@ -176,7 +192,7 @@ class _$PieceModelImpl implements _PieceModel {
 
   @override
   String toString() {
-    return 'PieceModel(type: $type, side: $side, col: $col, row: $row)';
+    return 'PieceModel(id: $id, type: $type, side: $side, col: $col, row: $row)';
   }
 
   @override
@@ -184,6 +200,7 @@ class _$PieceModelImpl implements _PieceModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PieceModelImpl &&
+            (identical(other.id, id) || other.id == id) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.side, side) || other.side == side) &&
             (identical(other.col, col) || other.col == col) &&
@@ -192,7 +209,7 @@ class _$PieceModelImpl implements _PieceModel {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, type, side, col, row);
+  int get hashCode => Object.hash(runtimeType, id, type, side, col, row);
 
   /// Create a copy of PieceModel
   /// with the given fields replaced by the non-null parameter values.
@@ -210,6 +227,7 @@ class _$PieceModelImpl implements _PieceModel {
 
 abstract class _PieceModel implements PieceModel {
   const factory _PieceModel({
+    required final String id,
     required final PieceType type,
     required final PieceSide side,
     required final int col,
@@ -219,6 +237,9 @@ abstract class _PieceModel implements PieceModel {
   factory _PieceModel.fromJson(Map<String, dynamic> json) =
       _$PieceModelImpl.fromJson;
 
+  /// 棋子唯一标识（用于 UI key 稳定性）
+  @override
+  String get id;
   @override
   PieceType get type;
   @override

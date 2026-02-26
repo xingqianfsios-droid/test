@@ -168,7 +168,7 @@ class GameView extends GetView<GameController> {
                 final isSelected = controller.selectedIndex.value == index;
 
                 return AnimatedPositioned(
-                  key: ValueKey('${piece.side.name}_${piece.type.name}_$index'),
+                  key: ValueKey(piece.id),
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeInOut,
                   left: pos.dx - pieceSize / 2,

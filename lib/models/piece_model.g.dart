@@ -8,6 +8,7 @@ part of 'piece_model.dart';
 
 _$PieceModelImpl _$$PieceModelImplFromJson(Map<String, dynamic> json) =>
     _$PieceModelImpl(
+      id: json['id'] as String,
       type: $enumDecode(_$PieceTypeEnumMap, json['type']),
       side: $enumDecode(_$PieceSideEnumMap, json['side']),
       col: (json['col'] as num).toInt(),
@@ -16,6 +17,7 @@ _$PieceModelImpl _$$PieceModelImplFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$$PieceModelImplToJson(_$PieceModelImpl instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'type': _$PieceTypeEnumMap[instance.type]!,
       'side': _$PieceSideEnumMap[instance.side]!,
       'col': instance.col,

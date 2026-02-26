@@ -6,7 +6,7 @@ void main() {
   group('炮 (Cannon) 走法测试', () {
     test('空棋盘上炮移动同车', () {
       final pieces = [
-        const PieceModel(type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
+        const PieceModel(id: 'p1', type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
       ];
       final board = buildBoard(pieces);
       final moves = getCannonMoves(col: 4, row: 4, side: PieceSide.red, board: board);
@@ -17,8 +17,8 @@ void main() {
 
     test('炮不能直接吃相邻棋子', () {
       final pieces = [
-        const PieceModel(type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.black, col: 4, row: 3), // 上方相邻
+        const PieceModel(id: 'p1', type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.black, col: 4, row: 3), // 上方相邻
       ];
       final board = buildBoard(pieces);
       final moves = getCannonMoves(col: 4, row: 4, side: PieceSide.red, board: board);
@@ -29,9 +29,9 @@ void main() {
 
     test('炮翻山吃子', () {
       final pieces = [
-        const PieceModel(type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 2), // 炮架
-        const PieceModel(type: PieceType.soldier, side: PieceSide.black, col: 4, row: 0), // 可吃目标
+        const PieceModel(id: 'p1', type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 2), // 炮架
+        const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.black, col: 4, row: 0), // 可吃目标
       ];
       final board = buildBoard(pieces);
       final moves = getCannonMoves(col: 4, row: 4, side: PieceSide.red, board: board);
@@ -46,9 +46,9 @@ void main() {
 
     test('炮不能翻山吃己方棋子', () {
       final pieces = [
-        const PieceModel(type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 2), // 炮架
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 0), // 己方棋子
+        const PieceModel(id: 'p1', type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 2), // 炮架
+        const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 0), // 己方棋子
       ];
       final board = buildBoard(pieces);
       final moves = getCannonMoves(col: 4, row: 4, side: PieceSide.red, board: board);
@@ -58,10 +58,10 @@ void main() {
 
     test('炮两个炮架不能吃子', () {
       final pieces = [
-        const PieceModel(type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 2), // 第一个炮架
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 1), // 第二个炮架
-        const PieceModel(type: PieceType.soldier, side: PieceSide.black, col: 4, row: 0), // 目标
+        const PieceModel(id: 'p1', type: PieceType.cannon, side: PieceSide.red, col: 4, row: 4),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 2), // 第一个炮架
+        const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 1), // 第二个炮架
+        const PieceModel(id: 'p4', type: PieceType.soldier, side: PieceSide.black, col: 4, row: 0), // 目标
       ];
       final board = buildBoard(pieces);
       final moves = getCannonMoves(col: 4, row: 4, side: PieceSide.red, board: board);
@@ -72,9 +72,9 @@ void main() {
 
     test('炮水平翻山吃子', () {
       final pieces = [
-        const PieceModel(type: PieceType.cannon, side: PieceSide.red, col: 0, row: 4),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 3, row: 4), // 炮架
-        const PieceModel(type: PieceType.soldier, side: PieceSide.black, col: 6, row: 4), // 可吃
+        const PieceModel(id: 'p1', type: PieceType.cannon, side: PieceSide.red, col: 0, row: 4),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 3, row: 4), // 炮架
+        const PieceModel(id: 'p3', type: PieceType.soldier, side: PieceSide.black, col: 6, row: 4), // 可吃
       ];
       final board = buildBoard(pieces);
       final moves = getCannonMoves(col: 0, row: 4, side: PieceSide.red, board: board);

@@ -7,12 +7,13 @@ void main() {
     test('按类型正确派发到对应函数', () {
       // 所有类型的棋子都能通过 getValidMoves 获取走法
       final types = PieceType.values;
-      for (final type in types) {
-        final piece = PieceModel(type: type, side: PieceSide.red, col: 4, row: 8);
+      for (var i = 0; i < types.length; i++) {
+        final type = types[i];
+        final piece = PieceModel(id: 'p${i + 1}', type: type, side: PieceSide.red, col: 4, row: 8);
         final board = buildBoard([
           piece,
-          const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-          const PieceModel(type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
+          const PieceModel(id: 'p100', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+          const PieceModel(id: 'p101', type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
         ]);
         // 不抛异常即为通过
         final moves = getValidMoves(piece: piece, board: board);
@@ -26,10 +27,10 @@ void main() {
       // 红帅(4,9)，黑车(0,9) 正在将军
       // 红仕(3,8) 只能走到能挡住将军的位置
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 0, row: 9), // 将军
-        const PieceModel(type: PieceType.advisor, side: PieceSide.red, col: 3, row: 8),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.chariot, side: PieceSide.black, col: 0, row: 9), // 将军
+        const PieceModel(id: 'p4', type: PieceType.advisor, side: PieceSide.red, col: 3, row: 8),
       ];
       final board = buildBoard(pieces);
       final advisor = pieces[3];
@@ -44,9 +45,9 @@ void main() {
     test('被将军时帅必须应将', () {
       // 红帅(4,9)，黑车(4,5) 将军
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 3, row: 0),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 4, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 3, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.chariot, side: PieceSide.black, col: 4, row: 5),
       ];
       final board = buildBoard(pieces);
       final king = pieces[0];
@@ -64,8 +65,8 @@ void main() {
   group('isInCheck 测试', () {
     test('被车将军时返回true', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 4, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.chariot, side: PieceSide.black, col: 4, row: 5),
       ];
       final board = buildBoard(pieces);
       expect(isInCheck(PieceSide.red, board), true);
@@ -73,8 +74,8 @@ void main() {
 
     test('未被将军时返回false', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 3, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.chariot, side: PieceSide.black, col: 3, row: 5),
       ];
       final board = buildBoard(pieces);
       expect(isInCheck(PieceSide.red, board), false);
@@ -82,9 +83,9 @@ void main() {
 
     test('被炮将军时返回true', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.red, col: 4, row: 7), // 炮架
-        const PieceModel(type: PieceType.cannon, side: PieceSide.black, col: 4, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.red, col: 4, row: 7), // 炮架
+        const PieceModel(id: 'p3', type: PieceType.cannon, side: PieceSide.black, col: 4, row: 5),
       ];
       final board = buildBoard(pieces);
       expect(isInCheck(PieceSide.red, board), true);
@@ -92,8 +93,8 @@ void main() {
 
     test('被马将军时返回true', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.horse, side: PieceSide.black, col: 3, row: 7),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.horse, side: PieceSide.black, col: 3, row: 7),
       ];
       final board = buildBoard(pieces);
       expect(isInCheck(PieceSide.red, board), true);
@@ -103,9 +104,9 @@ void main() {
   group('hasLegalMoves 测试', () {
     test('初始局面双方都有合法走法', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.red, col: 0, row: 9),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.chariot, side: PieceSide.red, col: 0, row: 9),
       ];
       final board = buildBoard(pieces);
       expect(hasLegalMoves(PieceSide.red, board), true);
@@ -115,11 +116,11 @@ void main() {
       // 红帅(3,9)：上(3,8)被车控制，左(2,9)被车控制，右(4,9)被车控制
       // 三辆车分别封锁帅的三个出路
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 3, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 5, row: 0),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 2, row: 9), // 控制 row 9 左侧
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 4, row: 9), // 控制 row 9 右侧
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 3, row: 5), // 控制 col 3
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 3, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 5, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.chariot, side: PieceSide.black, col: 2, row: 9), // 控制 row 9 左侧
+        const PieceModel(id: 'p4', type: PieceType.chariot, side: PieceSide.black, col: 4, row: 9), // 控制 row 9 右侧
+        const PieceModel(id: 'p5', type: PieceType.chariot, side: PieceSide.black, col: 3, row: 5), // 控制 col 3
       ];
       final board = buildBoard(pieces);
       // 帅(3,9): 左(2,9)有敌车不能吃因为被另一辆车将；右(4,9)有敌车；上(3,8)在车(3,5)攻击线
@@ -132,10 +133,10 @@ void main() {
       // 红帅(3,9)，黑车(3,5)将军，黑车(5,9)封住右路
       // 帅无处可走
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 3, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 5, row: 0),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 3, row: 5), // 纵向将军
-        const PieceModel(type: PieceType.chariot, side: PieceSide.black, col: 5, row: 8), // 控制 row 8
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 3, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 5, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.chariot, side: PieceSide.black, col: 3, row: 5), // 纵向将军
+        const PieceModel(id: 'p4', type: PieceType.chariot, side: PieceSide.black, col: 5, row: 8), // 控制 row 8
       ];
       final board = buildBoard(pieces);
       // 红帅(3,9)被车(3,5)将军
@@ -151,9 +152,9 @@ void main() {
   group('将帅对面规则', () {
     test('将帅同列中间无子时不能走出遮挡', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.red, col: 4, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.chariot, side: PieceSide.red, col: 4, row: 5),
       ];
       final board = buildBoard(pieces);
       final chariot = pieces[2];
@@ -167,9 +168,9 @@ void main() {
 
     test('将帅不同列时无对面限制', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 3, row: 0),
-        const PieceModel(type: PieceType.chariot, side: PieceSide.red, col: 4, row: 5),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 3, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.chariot, side: PieceSide.red, col: 4, row: 5),
       ];
       final board = buildBoard(pieces);
       final chariot = pieces[2];

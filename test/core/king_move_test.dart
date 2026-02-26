@@ -6,7 +6,7 @@ void main() {
   group('帅/将 (King) 走法测试', () {
     test('红帅在九宫中央可走4步', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 8),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 8),
       ];
       final board = buildBoard(pieces);
       final moves = getKingMoves(col: 4, row: 8, side: PieceSide.red, board: board);
@@ -22,7 +22,7 @@ void main() {
 
     test('红帅在左下角只能走2步', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 3, row: 9),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 3, row: 9),
       ];
       final board = buildBoard(pieces);
       final moves = getKingMoves(col: 3, row: 9, side: PieceSide.red, board: board);
@@ -36,7 +36,7 @@ void main() {
 
     test('黑将在九宫中央可走4步', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 4, row: 1),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.black, col: 4, row: 1),
       ];
       final board = buildBoard(pieces);
       final moves = getKingMoves(col: 4, row: 1, side: PieceSide.black, board: board);
@@ -52,7 +52,7 @@ void main() {
 
     test('帅不可走出九宫', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 5, row: 7),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 5, row: 7),
       ];
       final board = buildBoard(pieces);
       final moves = getKingMoves(col: 5, row: 7, side: PieceSide.red, board: board);
@@ -66,8 +66,8 @@ void main() {
 
     test('帅不可吃己方棋子', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 8),
-        const PieceModel(type: PieceType.advisor, side: PieceSide.red, col: 4, row: 7),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 8),
+        const PieceModel(id: 'p2', type: PieceType.advisor, side: PieceSide.red, col: 4, row: 7),
       ];
       final board = buildBoard(pieces);
       final moves = getKingMoves(col: 4, row: 8, side: PieceSide.red, board: board);
@@ -77,8 +77,8 @@ void main() {
 
     test('帅可吃敌方棋子', () {
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 8),
-        const PieceModel(type: PieceType.soldier, side: PieceSide.black, col: 4, row: 7),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 8),
+        const PieceModel(id: 'p2', type: PieceType.soldier, side: PieceSide.black, col: 4, row: 7),
       ];
       final board = buildBoard(pieces);
       final moves = getKingMoves(col: 4, row: 8, side: PieceSide.red, board: board);
@@ -92,9 +92,9 @@ void main() {
       // 红帅在 (4,9)，黑将在 (4,0)，中间无棋子
       // 红方仕在 (4,8)，如果移走仕则将帅对面
       final pieces = [
-        const PieceModel(type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
-        const PieceModel(type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
-        const PieceModel(type: PieceType.advisor, side: PieceSide.red, col: 4, row: 8),
+        const PieceModel(id: 'p1', type: PieceType.king, side: PieceSide.red, col: 4, row: 9),
+        const PieceModel(id: 'p2', type: PieceType.king, side: PieceSide.black, col: 4, row: 0),
+        const PieceModel(id: 'p3', type: PieceType.advisor, side: PieceSide.red, col: 4, row: 8),
       ];
       final board = buildBoard(pieces);
       final advisor = pieces[2];
