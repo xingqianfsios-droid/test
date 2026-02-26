@@ -16,7 +16,15 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Xiangqi Pro',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF5D4037),
+          brightness: Brightness.light,
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF4E342E),
+          foregroundColor: Colors.white,
+          elevation: 2,
+        ),
       ),
       initialRoute: '/',
       getPages: [

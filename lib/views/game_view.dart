@@ -16,6 +16,10 @@ class GameView extends GetView<GameController> {
       appBar: AppBar(
         title: const Text('象棋 Pro'),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => _showExitConfirm(),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
@@ -261,6 +265,32 @@ class GameView extends GetView<GameController> {
     );
   }
 
+  void _showExitConfirm() {
+    controller.pauseGame();
+    Get.dialog(
+      AlertDialog(
+        title: const Text('返回首页'),
+        content: const Text('当前对局将会丢失，确定返回首页吗？'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+              controller.resumeGame();
+            },
+            child: const Text('继续游戏'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              Get.back();
+            },
+            child: const Text('确定返回'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showRulesDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
@@ -417,7 +447,7 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: widget.isRed
-                  ? [Colors.red.shade100, Colors.red.shade50]
+                  ? [const Color(0xFFEFDBBE), const Color(0xFFF5E6D0)]
                   : [Colors.blueGrey.shade100, Colors.grey.shade200],
             ),
             boxShadow: [
@@ -438,10 +468,10 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
                 height: 14,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: widget.isRed ? Colors.red : Colors.black,
+                  color: widget.isRed ? const Color(0xFFC62828) : Colors.black,
                   boxShadow: [
                     BoxShadow(
-                      color: (widget.isRed ? Colors.red : Colors.black)
+                      color: (widget.isRed ? const Color(0xFFC62828) : Colors.black)
                           .withValues(alpha: 0.4),
                       blurRadius: 6,
                     ),
@@ -455,7 +485,7 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
-                  color: widget.inCheck ? Colors.red.shade700 : Colors.black87,
+                  color: widget.inCheck ? const Color(0xFFC62828) : Colors.black87,
                 ),
               ),
               const SizedBox(width: 16),
@@ -467,7 +497,7 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
                   color: widget.isPaused
                       ? Colors.grey
                       : isWarning
-                          ? Colors.red.shade600
+                          ? const Color(0xFFC62828)
                           : Colors.black54,
                   borderRadius: BorderRadius.circular(12),
                 ),

@@ -27,6 +27,7 @@ void main() {
 
     // 游戏页面元素
     expect(find.text('象棋 Pro'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     expect(find.byIcon(Icons.refresh), findsOneWidget);
     expect(find.byIcon(Icons.help_outline), findsOneWidget);
     expect(find.byIcon(Icons.pause), findsOneWidget);

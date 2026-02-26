@@ -14,9 +14,9 @@ class HomeView extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.red.shade800,
-              Colors.red.shade900,
-              Colors.brown.shade900,
+              const Color(0xFF5D4037),
+              const Color(0xFF4E342E),
+              const Color(0xFF3E2723),
             ],
           ),
         ),
@@ -59,7 +59,7 @@ class HomeView extends StatelessWidget {
                   height: 52,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.amber.shade700,
+                      backgroundColor: const Color(0xFFD4A04A),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(26),
@@ -71,7 +71,7 @@ class HomeView extends StatelessWidget {
                         letterSpacing: 4,
                       ),
                     ),
-                    onPressed: () => Get.offNamed('/game'),
+                    onPressed: () => Get.toNamed('/game'),
                     child: const Text('开始游戏'),
                   ),
                 ),
