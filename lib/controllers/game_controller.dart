@@ -6,6 +6,19 @@ import '../models/board_state.dart';
 import '../core/move_validator.dart';
 import '../core/sound_service.dart';
 
+/// 一步棋的记录
+class MoveRecord {
+  final List<PieceModel> pieces;
+  final PieceSide turn;
+  final bool wasInCheck;
+
+  MoveRecord({
+    required this.pieces,
+    required this.turn,
+    required this.wasInCheck,
+  });
+}
+
 class GameController extends GetxController {
   /// 棋盘上的所有棋子
   final pieces = <PieceModel>[].obs;
@@ -36,6 +49,18 @@ class GameController extends GetxController {
 
   /// 回合版本号（每次切换回合+1，用于触发动画）
   final turnVersion = 0.obs;
+
+  /// 走棋历史（用于悔棋）
+  final _moveHistory = <MoveRecord>[];
+
+  /// 是否可以悔棋
+  final canUndo = false.obs;
+
+  /// 提示的棋子索引
+  final hintPieceIndex = (-1).obs;
+
+  /// 提示的目标位置
+  final hintTarget = Rx<({int col, int row})?>(null);
 
   static const int maxCountdown = 30;
   static const int warningThreshold = 10;
@@ -68,6 +93,9 @@ class GameController extends GetxController {
     isPaused.value = false;
     winner.value = null;
     turnVersion.value = 0;
+    _moveHistory.clear();
+    canUndo.value = false;
+    _clearHint();
     _restartTimer();
     _sound.playStart();
   }
@@ -199,6 +227,15 @@ class GameController extends GetxController {
 
   /// 执行走子
   void _executeMove(int targetCol, int targetRow) {
+    // 记录走棋前的状态用于悔棋
+    _moveHistory.add(MoveRecord(
+      pieces: List<PieceModel>.from(pieces),
+      turn: currentTurn.value,
+      wasInCheck: inCheck.value,
+    ));
+    canUndo.value = true;
+    _clearHint();
+
     final selected = pieces[selectedIndex.value];
 
     final capturedIndex = pieces.indexWhere(
@@ -292,5 +329,122 @@ class GameController extends GetxController {
         currentTurn.value == PieceSide.red ? PieceSide.black : PieceSide.red;
     selectedIndex.value = -1;
     validMoves.clear();
+  }
+
+  // ============================================================
+  // 悔棋
+  // ============================================================
+
+  /// 悔棋：回退到上一步状态
+  void undoMove() {
+    if (_moveHistory.isEmpty) return;
+    if (isGameOver.value) return;
+
+    final record = _moveHistory.removeLast();
+    pieces.value = record.pieces;
+    currentTurn.value = record.turn;
+    inCheck.value = record.wasInCheck;
+    selectedIndex.value = -1;
+    validMoves.clear();
+    canUndo.value = _moveHistory.isNotEmpty;
+    _clearHint();
+
+    // 重启倒计时
+    _restartTimer();
+  }
+
+  // ============================================================
+  // 提示（走法建议）
+  // ============================================================
+
+  /// 清除提示状态
+  void _clearHint() {
+    hintPieceIndex.value = -1;
+    hintTarget.value = null;
+  }
+
+  /// 给当前走棋方一个走法提示
+  void showHint() {
+    if (isPaused.value || isGameOver.value) return;
+
+    final board = buildBoard(pieces);
+    final side = currentTurn.value;
+
+    // 优先级：能吃子 > 能将军 > 普通走法
+    ({int pieceIndex, ({int col, int row}) target, int score})? bestMove;
+
+    for (int i = 0; i < pieces.length; i++) {
+      final p = pieces[i];
+      if (p.side != side) continue;
+      final moves = getValidMoves(piece: p, board: board);
+      for (final m in moves) {
+        int score = 0;
+
+        // 吃子得分
+        final targetPiece = board[m.row][m.col];
+        if (targetPiece != null && targetPiece.side != side) {
+          score += _pieceValue(targetPiece.type);
+        }
+
+        // 走后是否将军得分
+        final simBoard = _simulateMove(board, p, m.col, m.row);
+        final enemySide =
+            side == PieceSide.red ? PieceSide.black : PieceSide.red;
+        if (isInCheck(enemySide, simBoard)) {
+          score += 50;
+        }
+
+        if (bestMove == null || score > bestMove.score) {
+          bestMove = (pieceIndex: i, target: m, score: score);
+        }
+      }
+    }
+
+    if (bestMove != null) {
+      hintPieceIndex.value = bestMove.pieceIndex;
+      hintTarget.value = bestMove.target;
+
+      // 3秒后自动清除提示
+      Future.delayed(const Duration(seconds: 3), () {
+        _clearHint();
+      });
+    }
+  }
+
+  /// 模拟走子（用于提示评估）
+  static List<List<PieceModel?>> _simulateMove(
+    List<List<PieceModel?>> board,
+    PieceModel piece,
+    int targetCol,
+    int targetRow,
+  ) {
+    final newBoard = List.generate(
+      10,
+      (r) => List<PieceModel?>.generate(9, (c) => board[r][c]),
+    );
+    newBoard[piece.row][piece.col] = null;
+    newBoard[targetRow][targetCol] =
+        piece.copyWith(col: targetCol, row: targetRow);
+    return newBoard;
+  }
+
+  /// 棋子价值评估
+  static int _pieceValue(PieceType type) {
+    switch (type) {
+      case PieceType.king:
+        return 10000;
+      case PieceType.chariot:
+        return 100;
+      case PieceType.horse:
+        return 50;
+      case PieceType.cannon:
+        return 50;
+      case PieceType.elephant:
+        return 20;
+      case PieceType.advisor:
+        return 20;
+      case PieceType.soldier:
+        return 10;
+    }
   }
 }

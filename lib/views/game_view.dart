@@ -85,6 +85,8 @@ class GameView extends GetView<GameController> {
               ),
             ),
           ),
+          // 底部功能按钮栏
+          _buildActionButtons(context),
         ],
       ),
     );
@@ -160,6 +162,36 @@ class GameView extends GetView<GameController> {
                   ),
                 );
               }),
+
+              // 提示层：高亮提示棋子和目标位置
+              if (controller.hintPieceIndex.value >= 0 &&
+                  controller.hintPieceIndex.value < controller.pieces.length) ...[
+                // 提示棋子高亮
+                Builder(builder: (_) {
+                  final hintPiece = controller.pieces[controller.hintPieceIndex.value];
+                  final pos = gridToPixel(hintPiece.col, hintPiece.row, cellSize, offsetX, offsetY);
+                  return Positioned(
+                    left: pos.dx - pieceSize / 2 - 3,
+                    top: pos.dy - pieceSize / 2 - 3,
+                    child: IgnorePointer(
+                      child: _HintGlow(size: pieceSize + 6, color: _kGoldLight),
+                    ),
+                  );
+                }),
+                // 提示目标位置
+                if (controller.hintTarget.value != null)
+                  Builder(builder: (_) {
+                    final t = controller.hintTarget.value!;
+                    final pos = gridToPixel(t.col, t.row, cellSize, offsetX, offsetY);
+                    return Positioned(
+                      left: pos.dx - pieceSize / 2,
+                      top: pos.dy - pieceSize / 2,
+                      child: IgnorePointer(
+                        child: _HintGlow(size: pieceSize, color: const Color(0xFF4CAF50)),
+                      ),
+                    );
+                  }),
+              ],
 
               // 顶层：棋子
               ...controller.pieces.asMap().entries.map((entry) {
@@ -331,6 +363,43 @@ class GameView extends GetView<GameController> {
     );
   }
 
+  Widget _buildActionButtons(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Color(0x20000000), width: 1),
+        ),
+      ),
+      child: Obx(() => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _ActionButton(
+                icon: Icons.replay,
+                label: '重玩',
+                onTap: () => _showResetConfirm(context),
+              ),
+              _ActionButton(
+                icon: Icons.lightbulb_outline,
+                label: '提示',
+                onTap: controller.isPaused.value || controller.isGameOver.value
+                    ? null
+                    : () => controller.showHint(),
+              ),
+              _ActionButton(
+                icon: Icons.undo,
+                label: '悔棋',
+                onTap: controller.canUndo.value &&
+                        !controller.isPaused.value &&
+                        !controller.isGameOver.value
+                    ? () => controller.undoMove()
+                    : null,
+              ),
+            ],
+          )),
+    );
+  }
+
   void _showRulesDialog(BuildContext context) {
     Get.dialog(
       AlertDialog(
@@ -398,6 +467,127 @@ class _RuleSection extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// 底部功能按钮
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    final color = enabled ? _kInk : const Color(0xFFB0A89A);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: enabled ? const Color(0xFFE8D5B0) : const Color(0xFFF0E8DA),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: enabled ? _kGold : const Color(0xFFCCC4B4),
+            width: 1,
+          ),
+          boxShadow: enabled
+              ? [
+                  BoxShadow(
+                    color: _kGold.withValues(alpha: 0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 22, color: color),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: color,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 提示光晕效果
+class _HintGlow extends StatefulWidget {
+  final double size;
+  final Color color;
+
+  const _HintGlow({required this.size, required this.color});
+
+  @override
+  State<_HintGlow> createState() => _HintGlowState();
+}
+
+class _HintGlowState extends State<_HintGlow>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.4, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Container(
+          width: widget.size,
+          height: widget.size,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: widget.color.withValues(alpha: _animation.value),
+              width: 3,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: widget.color.withValues(alpha: _animation.value * 0.5),
+                blurRadius: 8,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
