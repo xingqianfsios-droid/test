@@ -1,0 +1,52 @@
+name: Claude Code Auto-Implement
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  implement:
+    if: github.event.label.name == 'claude-implement'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          additional_instructions: |
+            你正在为一个 Flutter 中国象棋（Xiangqi）游戏实现功能。
+
+            关键规则：
+            1. 仔细阅读 CLAUDE.md — 包含架构规范和项目规则
+            2. 参考 SKILLS.md — 包含棋类逻辑的参考模式
+            3. 遵循 GetX 模式：控制器放 lib/controllers/，视图放 lib/views/
+            4. 新数据结构使用 Freezed 模型，放 lib/models/
+            5. 确保代码通过 flutter analyze
+            6. 提交信息使用中文，遵循 conventional commit 格式
+            7. PR 描述需包含：修改内容、涉及文件、测试方式
+
+            禁止：
+            - 不要随意修改 pubspec.yaml 依赖
+            - 不要破坏现有的 GetX 控制器绑定
+            - 不要改变坐标系（0,0 = 左上角，9x10 棋盘）

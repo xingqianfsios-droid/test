@@ -1,0 +1,97 @@
+name: Notify Slack
+
+on:
+  pull_request:
+    types: [opened, closed]
+  issues:
+    types: [labeled]
+
+jobs:
+  notify-claude-started:
+    if: github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'claude-implement'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack - Claude Started
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":robot_face: *Claude Code 开始实现任务*\n*${{ github.event.issue.title }}*\n<${{ github.event.issue.html_url }}|查看 Issue>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  notify-pr-opened:
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack - PR Opened
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "New PR: ${{ github.event.pull_request.title }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${{ github.event.pull_request.user.login }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n`${{ github.event.pull_request.head.ref }}`"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<${{ github.event.pull_request.html_url }}|:eyes: 查看 Pull Request>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  notify-pr-merged:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack - PR Merged
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":white_check_mark: *PR 已合并:* ${{ github.event.pull_request.title }}\n合并到 `${{ github.event.pull_request.base.ref }}` by *${{ github.event.pull_request.merged_by.login }}*\n<${{ github.event.pull_request.html_url }}|查看 PR>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

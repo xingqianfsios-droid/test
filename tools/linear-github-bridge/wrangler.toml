@@ -1,0 +1,13 @@
+name = "linear-github-bridge"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+GITHUB_REPO = "xingqianfsios-droid/test"
+
+# Secrets (通过 wrangler secret put 设置，不要写在这里):
+# - LINEAR_WEBHOOK_SECRET
+# - LINEAR_API_KEY
+# - GITHUB_TOKEN
+# - SLACK_SIGNING_SECRET
