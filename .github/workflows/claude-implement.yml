@@ -37,24 +37,16 @@ jobs:
           label_trigger: "claude-implement"
           prompt: |
             请根据 Issue 描述实现功能需求，完成后创建 PR。
-          settings: |
-            {
-              "permissions": {
-                "allow": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
-                "deny": []
-              }
-            }
-          additional_instructions: |
+
             你正在为一个 Flutter 中国象棋（Xiangqi）游戏实现功能。
 
             关键规则：
             1. 仔细阅读 CLAUDE.md — 包含架构规范和项目规则
-            2. 参考 SKILLS.md — 包含棋类逻辑的参考模式
-            3. 遵循 GetX 模式：控制器放 lib/controllers/，视图放 lib/views/
-            4. 新数据结构使用 Freezed 模型，放 lib/models/
-            5. 确保代码通过 flutter analyze
-            6. 提交信息使用中文，遵循 conventional commit 格式
-            7. PR 描述需包含：修改内容、涉及文件、测试方式
+            2. 遵循 GetX 模式：控制器放 lib/controllers/，视图放 lib/views/
+            3. 新数据结构使用 Freezed 模型，放 lib/models/
+            4. 确保代码通过 flutter analyze
+            5. 提交信息使用中文，遵循 conventional commit 格式
+            6. PR 描述需包含：修改内容、涉及文件、测试方式
 
             禁止：
             - 不要随意修改 pubspec.yaml 依赖
