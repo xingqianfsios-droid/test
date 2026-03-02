@@ -34,6 +34,16 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          label_trigger: "claude-implement"
+          prompt: |
+            请根据 Issue 描述实现功能需求，完成后创建 PR。
+          settings: |
+            {
+              "permissions": {
+                "allow": ["Bash", "Read", "Write", "Edit", "Glob", "Grep"],
+                "deny": []
+              }
+            }
           additional_instructions: |
             你正在为一个 Flutter 中国象棋（Xiangqi）游戏实现功能。
 
