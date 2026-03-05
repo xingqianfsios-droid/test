@@ -60,7 +60,18 @@ export async function handleLinearWebhook(
   // 2. 解析并过滤事件
   const payload: LinearWebhookPayload = JSON.parse(body);
 
+  // 调试日志 — 查看 Linear 实际发送的数据
+  console.log('LINEAR WEBHOOK:', JSON.stringify({
+    action: payload.action,
+    type: payload.type,
+    stateType: payload.data?.state?.type,
+    stateName: payload.data?.state?.name,
+    title: payload.data?.title,
+    labels: payload.data?.labels,
+  }));
+
   if (payload.type !== 'Issue') {
+    console.log('SKIPPED: not an issue, type =', payload.type);
     return new Response('Skipped: not an issue event', { status: 200 });
   }
 
@@ -71,6 +82,8 @@ export async function handleLinearWebhook(
   const hasReadyLabel = payload.data.labels?.some(
     (l) => l.name.toLowerCase() === 'ready-for-claude',
   );
+
+  console.log('FILTER CHECK:', { isInProgress, hasReadyLabel, action: payload.action, stateType: payload.data.state?.type });
 
   if (!isInProgress && !hasReadyLabel) {
     return new Response('Skipped: event filtered', { status: 200 });

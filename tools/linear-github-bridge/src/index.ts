@@ -22,7 +22,17 @@ export default {
     }
 
     if (url.pathname === '/health') {
-      return new Response(JSON.stringify({ status: 'ok', time: new Date().toISOString() }), {
+      return new Response(JSON.stringify({
+        status: 'ok',
+        time: new Date().toISOString(),
+        secrets: {
+          LINEAR_WEBHOOK_SECRET: env.LINEAR_WEBHOOK_SECRET ? `set (${env.LINEAR_WEBHOOK_SECRET.length} chars)` : 'MISSING',
+          LINEAR_API_KEY: env.LINEAR_API_KEY ? `set (${env.LINEAR_API_KEY.length} chars)` : 'MISSING',
+          GITHUB_TOKEN: env.GITHUB_TOKEN ? `set (${env.GITHUB_TOKEN.length} chars)` : 'MISSING',
+          SLACK_SIGNING_SECRET: env.SLACK_SIGNING_SECRET ? `set (${env.SLACK_SIGNING_SECRET.length} chars)` : 'MISSING',
+          GITHUB_REPO: env.GITHUB_REPO ?? 'MISSING',
+        },
+      }), {
         headers: { 'Content-Type': 'application/json' },
       });
     }
