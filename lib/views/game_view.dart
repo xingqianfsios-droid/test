@@ -15,6 +15,12 @@ const _kGoldLight = Color(0xFFD4A84B);
 const _kBamboo = Color(0xFFE8D5B0);
 const _kRedInk = Color(0xFFA01010);
 
+/// 按钮主色：深朱红
+const _kBtnPrimary = Color(0xFFC0392B);
+const _kBtnPrimaryDark = Color(0xFF922B21);
+const _kBtnPrimaryLight = Color(0xFFE74C3C);
+const _kBtnOutlineBorder = Color(0xFFD4A84B);
+
 class GameView extends GetView<GameController> {
   const GameView({super.key});
 
@@ -241,20 +247,9 @@ class GameView extends GetView<GameController> {
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 12)),
                           const SizedBox(height: 24),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _kGold,
-                              foregroundColor: _kParchment,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 32, vertical: 12),
-                            ),
+                          _GamePrimaryButton(
+                            label: '继续对弈',
                             onPressed: () => controller.resumeGame(),
-                            child: const Text('继续对弈',
-                                style: TextStyle(
-                                    fontSize: 16, letterSpacing: 4)),
                           ),
                         ],
                       ),
@@ -289,6 +284,14 @@ class GameView extends GetView<GameController> {
                 style: const TextStyle(fontSize: 18, color: Color(0xFF5C3A1E))),
             actions: [
               TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: _kBtnPrimary,
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4,
+                  ),
+                ),
                 onPressed: () {
                   Get.back();
                   controller.resetBoard();
@@ -317,10 +320,26 @@ class GameView extends GetView<GameController> {
         content: const Text('确定要重新开始对弈吗？'),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: _kGold,
+              textStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 2,
+              ),
+            ),
             onPressed: () => Get.back(),
             child: const Text('取消'),
           ),
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: _kBtnPrimary,
+              textStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
             onPressed: () {
               Get.back();
               controller.resetBoard();
@@ -345,6 +364,14 @@ class GameView extends GetView<GameController> {
         content: const Text('当前对局将会丢失，确定返回吗？'),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: _kGold,
+              textStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 2,
+              ),
+            ),
             onPressed: () {
               Get.back();
               controller.resumeGame();
@@ -352,6 +379,14 @@ class GameView extends GetView<GameController> {
             child: const Text('继续对弈'),
           ),
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: _kBtnPrimary,
+              textStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 2,
+              ),
+            ),
             onPressed: () {
               Get.back();
               Get.back();
@@ -435,6 +470,14 @@ class GameView extends GetView<GameController> {
         ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: _kBtnPrimary,
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 4,
+              ),
+            ),
             onPressed: () => Get.back(),
             child: const Text('知晓'),
           ),
@@ -471,7 +514,7 @@ class _RuleSection extends StatelessWidget {
   }
 }
 
-/// 底部功能按钮
+/// 底部功能按钮（升级版：启用态深朱红边框 + 阴影，禁用态淡出）
 class _ActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -486,25 +529,31 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    final color = enabled ? _kInk : const Color(0xFFB0A89A);
+    final iconColor = enabled ? _kBtnPrimary : const Color(0xFFBBAA9A);
+    final textColor = enabled ? _kInk : const Color(0xFFBBAA9A);
+    final borderColor = enabled ? _kBtnPrimary : const Color(0xFFCCC4B4);
+    final bgColor = enabled ? const Color(0xFFFAF0E6) : const Color(0xFFF5EDE4);
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
         decoration: BoxDecoration(
-          color: enabled ? const Color(0xFFE8D5B0) : const Color(0xFFF0E8DA),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: enabled ? _kGold : const Color(0xFFCCC4B4),
-            width: 1,
-          ),
+          color: bgColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor, width: enabled ? 1.5 : 1),
           boxShadow: enabled
               ? [
                   BoxShadow(
-                    color: _kGold.withValues(alpha: 0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    color: _kBtnPrimary.withValues(alpha: 0.18),
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
+                  ),
+                  const BoxShadow(
+                    color: Color(0x20000000),
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
                   ),
                 ]
               : null,
@@ -512,19 +561,67 @@ class _ActionButton extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 2),
+            Icon(icon, size: 24, color: iconColor),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: color,
+                color: textColor,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// 游戏页内主按钮（暂停遮罩使用）
+class _GamePrimaryButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+
+  const _GamePrimaryButton({required this.label, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_kBtnPrimaryLight, _kBtnPrimary, _kBtnPrimaryDark],
+        ),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _kBtnOutlineBorder, width: 1.5),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x60922B21),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          foregroundColor: _kParchment,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 4,
+          ),
+        ),
+        onPressed: onPressed,
+        child: Text(label),
       ),
     );
   }

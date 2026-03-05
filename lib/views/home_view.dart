@@ -8,6 +8,15 @@ const _kGold = Color(0xFF8B6914);
 const _kGoldLight = Color(0xFFD4A84B);
 const _kBamboo = Color(0xFFE8D5B0);
 
+/// 按钮主色：深朱红（主按钮）
+const _kBtnPrimary = Color(0xFFC0392B);
+const _kBtnPrimaryDark = Color(0xFF922B21);
+const _kBtnPrimaryLight = Color(0xFFE74C3C);
+
+/// 按钮次色：描金镂空（次按钮）
+const _kBtnOutlineBorder = Color(0xFFD4A84B);
+const _kBtnOutlineText = Color(0xFFD4A84B);
+
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -74,59 +83,21 @@ class HomeView extends StatelessWidget {
 
               const Spacer(flex: 3),
 
-              // 开始游戏按钮
+              // 开始游戏按钮（主按钮：深朱红渐变 + 金边 + 大阴影）
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _kGold,
-                      foregroundColor: _kParchment,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: const BorderSide(color: _kGoldLight, width: 1),
-                      ),
-                      elevation: 8,
-                      shadowColor: const Color(0x80000000),
-                      textStyle: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 8,
-                      ),
-                    ),
-                    onPressed: () => Get.toNamed('/game'),
-                    child: const Text('开始对弈'),
-                  ),
+                child: _PrimaryButton(
+                  label: '开始对弈',
+                  onPressed: () => Get.toNamed('/game'),
                 ),
               ),
               const SizedBox(height: 16),
-              // 游戏规则按钮
+              // 游戏规则按钮（次按钮：描金镂空）
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 54,
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: _kBamboo,
-                      side: BorderSide(
-                        color: _kBamboo.withValues(alpha: 0.4),
-                        width: 1,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 8,
-                      ),
-                    ),
-                    onPressed: () => _showRulesDialog(context),
-                    child: const Text('棋谱规则'),
-                  ),
+                child: _SecondaryButton(
+                  label: '棋谱规则',
+                  onPressed: () => _showRulesDialog(context),
                 ),
               ),
 
@@ -220,10 +191,109 @@ class HomeView extends StatelessWidget {
         ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: _kBtnPrimary,
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 4,
+              ),
+            ),
             onPressed: () => Get.back(),
             child: const Text('知晓'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// 主按钮：深朱红渐变背景 + 金边描边 + 阴影
+class _PrimaryButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+
+  const _PrimaryButton({required this.label, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [_kBtnPrimaryLight, _kBtnPrimary, _kBtnPrimaryDark],
+          ),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: _kBtnOutlineBorder, width: 1.5),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x60922B21),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Color(0x30000000),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            foregroundColor: _kParchment,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            textStyle: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 8,
+            ),
+          ),
+          onPressed: onPressed,
+          child: Text(label),
+        ),
+      ),
+    );
+  }
+}
+
+/// 次按钮：金色描边镂空
+class _SecondaryButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
+
+  const _SecondaryButton({required this.label, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: _kBtnOutlineText,
+          side: const BorderSide(color: _kBtnOutlineBorder, width: 1.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          backgroundColor: const Color(0x15D4A84B),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          textStyle: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 8,
+          ),
+        ),
+        onPressed: onPressed,
+        child: Text(label),
       ),
     );
   }
