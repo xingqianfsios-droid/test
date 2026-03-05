@@ -77,6 +77,7 @@ class GameView extends GetView<GameController> {
                 countdown: controller.countdown.value,
                 turnVersion: controller.turnVersion.value,
                 isPaused: controller.isPaused.value,
+                isAiThinking: controller.isAiThinking.value,
               )),
           // 棋盘区域：左右各 16px 间隙
           Expanded(
@@ -696,6 +697,7 @@ class _TurnStatusBar extends StatefulWidget {
   final int countdown;
   final int turnVersion;
   final bool isPaused;
+  final bool isAiThinking;
 
   const _TurnStatusBar({
     required this.isRed,
@@ -703,6 +705,7 @@ class _TurnStatusBar extends StatefulWidget {
     required this.countdown,
     required this.turnVersion,
     required this.isPaused,
+    required this.isAiThinking,
   });
 
   @override
@@ -807,7 +810,9 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
               const SizedBox(width: 10),
               // 回合文字
               Text(
-                '$turnText执棋$checkText',
+                widget.isAiThinking
+                    ? 'AI 思考中$checkText'
+                    : '$turnText执棋$checkText',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
@@ -816,25 +821,35 @@ class _TurnStatusBarState extends State<_TurnStatusBar>
                 ),
               ),
               const SizedBox(width: 16),
-              // 倒计时
+              // 倒计时 / AI 状态标签
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: widget.isPaused
                       ? const Color(0xFF8B8B7A)
-                      : isWarning
-                          ? _kRedInk
-                          : _kInk,
+                      : widget.isAiThinking
+                          ? const Color(0xFF1A1A1A)
+                          : isWarning
+                              ? _kRedInk
+                              : _kInk,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  widget.isPaused ? '暂停' : '${widget.countdown}s',
+                  widget.isPaused
+                      ? '暂停'
+                      : widget.isAiThinking
+                          ? '...'
+                          : '${widget.countdown}s',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: _kBamboo,
-                    letterSpacing: widget.isPaused ? 2 : (isWarning ? 1.0 : 0),
+                    letterSpacing: widget.isPaused
+                        ? 2
+                        : widget.isAiThinking
+                            ? 4
+                            : (isWarning ? 1.0 : 0),
                   ),
                 ),
               ),

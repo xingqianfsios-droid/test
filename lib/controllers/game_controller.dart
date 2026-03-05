@@ -41,6 +41,9 @@ class GameController extends GetxController {
   /// 是否暂停
   final isPaused = false.obs;
 
+  /// AI（黑方）是否正在思考中
+  final isAiThinking = false.obs;
+
   /// 赢家
   final winner = Rx<PieceSide?>(null);
 
@@ -69,6 +72,9 @@ class GameController extends GetxController {
   final SoundService _sound = SoundService();
   final _random = Random();
 
+  /// AI 走棋取消令牌：每次悔棋/重置时递增，已安排的 AI 走棋检测不一致则取消
+  int _aiMoveToken = 0;
+
   @override
   void onInit() {
     super.onInit();
@@ -84,6 +90,8 @@ class GameController extends GetxController {
 
   /// 重置棋盘到初始状态
   void resetBoard() {
+    // 取消任何待执行的 AI 走棋
+    _aiMoveToken++;
     pieces.value = initialPieces();
     currentTurn.value = PieceSide.red;
     selectedIndex.value = -1;
@@ -91,6 +99,7 @@ class GameController extends GetxController {
     inCheck.value = false;
     isGameOver.value = false;
     isPaused.value = false;
+    isAiThinking.value = false;
     winner.value = null;
     turnVersion.value = 0;
     _moveHistory.clear();
@@ -181,6 +190,10 @@ class GameController extends GetxController {
   void onBoardTap(int col, int row) {
     if (isPaused.value) return;
     if (isGameOver.value) return;
+    // AI 思考期间（黑方回合）禁止玩家操作棋盘
+    if (isAiThinking.value) return;
+    // 只有红方由玩家操作
+    if (currentTurn.value == PieceSide.black) return;
 
     final board = buildBoard(pieces);
     final tappedPiece = board[row][col];
@@ -280,9 +293,25 @@ class GameController extends GetxController {
     // 检查游戏状态
     _checkGameState();
 
-    // 重启倒计时
     if (!isGameOver.value) {
-      _restartTimer();
+      if (nextSide == PieceSide.black) {
+        // 黑方由 AI 自动走棋：停止倒计时，延迟 800ms 后执行
+        _stopTimer();
+        isAiThinking.value = true;
+        final token = ++_aiMoveToken;
+        Future.delayed(const Duration(milliseconds: 800), () {
+          // 令牌不一致说明已被悔棋/重置取消
+          if (token != _aiMoveToken) return;
+          if (!isGameOver.value && !isPaused.value) {
+            _autoMove();
+          }
+          isAiThinking.value = false;
+        });
+      } else {
+        // 红方由玩家操作：重启倒计时
+        isAiThinking.value = false;
+        _restartTimer();
+      }
     }
   }
 
@@ -312,7 +341,21 @@ class GameController extends GetxController {
   void resumeGame() {
     if (isGameOver.value) return;
     isPaused.value = false;
-    _resumeTimer();
+    if (currentTurn.value == PieceSide.black) {
+      // 黑方回合恢复时，重新安排 AI 走棋
+      isAiThinking.value = true;
+      final token = ++_aiMoveToken;
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (token != _aiMoveToken) return;
+        if (!isGameOver.value && !isPaused.value) {
+          _autoMove();
+        }
+        isAiThinking.value = false;
+      });
+    } else {
+      // 红方回合恢复倒计时
+      _resumeTimer();
+    }
   }
 
   /// 选中棋子（保留向后兼容）
@@ -336,11 +379,24 @@ class GameController extends GetxController {
   // ============================================================
 
   /// 悔棋：回退到上一步状态
+  /// 由于黑方是 AI，一次悔棋会连续倒退两步（黑方 + 红方），确保始终回到红方回合
   void undoMove() {
     if (_moveHistory.isEmpty) return;
     if (isGameOver.value) return;
 
-    final record = _moveHistory.removeLast();
+    // 取消任何待执行的 AI 走棋
+    _aiMoveToken++;
+    isAiThinking.value = false;
+
+    // 弹出最近一步
+    var record = _moveHistory.removeLast();
+
+    // 如果弹出后回合变成了黑方（说明刚才弹的是红方走的那步），
+    // 需要再弹一步黑方的走棋记录，确保最终回到红方回合
+    if (record.turn == PieceSide.black && _moveHistory.isNotEmpty) {
+      record = _moveHistory.removeLast();
+    }
+
     pieces.value = record.pieces;
     currentTurn.value = record.turn;
     inCheck.value = record.wasInCheck;
@@ -349,7 +405,7 @@ class GameController extends GetxController {
     canUndo.value = _moveHistory.isNotEmpty;
     _clearHint();
 
-    // 重启倒计时
+    // 重启倒计时（红方回合）
     _restartTimer();
   }
 
