@@ -27,7 +27,7 @@ class BoardPainter extends CustomPainter {
 
   void _drawBackground(Canvas canvas, Size size) {
     // 木质底色
-    final paint = Paint()..color = const Color(0xFFDEB887);
+    final paint = Paint()..color = const Color(0xFFF5DEB3);
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
 
     // 细微木纹纹理效果

@@ -45,21 +45,28 @@ class PieceWidget extends StatelessWidget {
     final textColor = isRed ? const Color(0xFFA01010) : const Color(0xFF1A1A1A);
     final name = getPieceName(piece.type, piece.side);
 
+    // 红方：朱砂暖红；黑方：玄墨深棕
+    final normalColors = isRed
+        ? [const Color(0xFFFFE0D0), const Color(0xFFCC5A3A)]
+        : [const Color(0xFFD8D0C0), const Color(0xFF6A5040)];
+    final borderColor = isRed
+        ? const Color(0xFF8B2010)
+        : const Color(0xFF3A2810);
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        // 木质棋子渐变底色
         gradient: RadialGradient(
           center: const Alignment(-0.2, -0.3),
           radius: 0.9,
           colors: isSelected
               ? [const Color(0xFFFFF3D6), const Color(0xFFE8C878)]
-              : [const Color(0xFFF7E8C8), const Color(0xFFD4B47A)],
+              : normalColors,
         ),
         border: Border.all(
-          color: isSelected ? const Color(0xFFD4A84B) : const Color(0xFF6B3A1F),
+          color: isSelected ? const Color(0xFFD4A84B) : borderColor,
           width: isSelected ? 2.5 : 1.5,
         ),
         boxShadow: [
